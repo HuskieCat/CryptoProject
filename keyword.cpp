@@ -10,7 +10,7 @@ char cypherSheet[26][26];
 void printCypherSheet();
 string toLower(string);
 string encode(string, string);
-string decode(int, string);
+string decode(string, string);
 string enterKey();
 string phraseToProcess();
 
@@ -66,19 +66,17 @@ int main()
             else
                 cout << "Not a valid response" << endl;
         }
+
         if(yesNo == 'y')
         {
             string key = enterKey();
             cout << "Phrase entered: " << phrase << endl;
-            cout << "Decoded: " << decode(6, phrase) << endl;
+            cout << "Decoded: " << decode(key, phrase) << endl;
         }
+
         if(yesNo == 'n')
         {   
-            cout << "Brute Forcing" << endl;
-            for(int i = 1; i < 26; i++)
-            {
-                cout << "Decoded with " << (char) (i + 97)  << ": " << decode(i, phrase) << endl;
-            }
+            cout << "I'm sorry, Dave, I can't do that" << endl;
         }
     }
 
@@ -122,7 +120,18 @@ string decode(string keyIndex, string phrase)
 
         // Decode
         int keyRow = keyIndex[index] - 'a';
-        int currentI = phrase[i] - 'a';
+        char character;
+        
+        for(int column = 0; column < 26; column++)
+        {
+            if(cypherSheet[keyRow][column] == phrase[i])
+            {
+                decodedPhrase += cypherSheet[0][column];
+                break;
+            }
+        }
+        if(++index == keyIndex.length())
+            index = 0;
     }
 
     return decodedPhrase;
@@ -191,7 +200,9 @@ string enterKey()
     bool passed = true;
     while (true)
     {
-        getline(cin, key);
+        // getline(cin, key);
+        cin.clear();
+        cin.sync();
         cout << "Please enter a word without special symbols: ";
         getline(cin, key);
 
@@ -221,6 +232,8 @@ string phraseToProcess()
 {
     string phrase = "";
     // getline(cin, phrase);
+    cin.clear();
+    cin.sync();
     cout << "Please enter a phrase: ";
     getline(cin, phrase);
 
