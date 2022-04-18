@@ -9,10 +9,9 @@ void generateCypherSheet();
 char cypherSheet[26][26];
 void printCypherSheet();
 string toLower(string);
-string encode(int, string);
+string encode(string, string);
 string decode(int, string);
-int findKeyIndex(char);
-char enterKey();
+string enterKey();
 string phraseToProcess();
 
 /*
@@ -41,12 +40,12 @@ int main()
 
     if(enOrDe == 'e')
     {
-        char key = enterKey();
+        string key = enterKey();
+        // cout << "Your key is: " << key << endl;
         string phrase = phraseToProcess();
         // cout << "Your phrase is: " << phrase << endl;
-        int keyIndex = findKeyIndex(key);
         phrase = toLower(phrase);
-        cout << "Encoded: " << encode(keyIndex, phrase) << endl;
+        cout << "Encoded: " << encode(key, phrase) << endl;
     }
 
     if(enOrDe == 'd')
@@ -69,10 +68,9 @@ int main()
         }
         if(yesNo == 'y')
         {
-            char key = enterKey();
-            int keyIndex = findKeyIndex(key);
+            string key = enterKey();
             cout << "Phrase entered: " << phrase << endl;
-            cout << "Decoded: " << decode(keyIndex, phrase) << endl;
+            cout << "Decoded: " << decode(6, phrase) << endl;
         }
         if(yesNo == 'n')
         {   
@@ -87,9 +85,10 @@ int main()
     return 0;
 }
 
-string encode(int keyIndex, string phrase)
+string encode(string keyIndex, string phrase)
 {
     string encodedPhrase = "";
+    int index = 0;
     for (int i = 0; i < phrase.length(); i++)
     {
         if (phrase[i] < 'a' || phrase[i] > 'z')
@@ -97,22 +96,22 @@ string encode(int keyIndex, string phrase)
             encodedPhrase += phrase[i];
             continue;
         }
-        for (int j = 0; j < 26; j++)
-        {
-            if (cypherSheet[0][j] == phrase[i])
-            {
-                encodedPhrase += cypherSheet[j][keyIndex];
-                break;
-            }
-        }
+
+        // Encoding part
+        int keyRow = keyIndex[index] - 'a';
+        int currentI = phrase[i] - 'a';
+        encodedPhrase += cypherSheet[keyRow][currentI];
+        if(++index == keyIndex.length())
+            index = 0;
     }
 
     return encodedPhrase;
 }
 
-string decode(int keyIndex, string phrase)
+string decode(string keyIndex, string phrase)
 {
     string decodedPhrase = "";
+    int index = 0;
     for(int i = 0; i < phrase.length(); i++)
     {
         if(phrase[i] < 'a' || phrase[i] > 'z')
@@ -121,22 +120,12 @@ string decode(int keyIndex, string phrase)
             continue;
         }
 
-        for(int j = 0; j < 26; j++)
-        {
-            if(phrase[i] == cypherSheet[keyIndex][j])
-            {
-                decodedPhrase += cypherSheet[j][0];
-                break;
-            }
-        }
+        // Decode
+        int keyRow = keyIndex[index] - 'a';
+        int currentI = phrase[i] - 'a';
     }
 
     return decodedPhrase;
-}
-
-int findKeyIndex(char key)
-{
-    return key - 97;
 }
 
 void generateCypherSheet()
@@ -196,29 +185,42 @@ string toLower(string message)
     return temp;
 }
 
-char enterKey()
+string enterKey()
 {
-    char keyLetter = 'a';
+    string key = "";
+    bool passed = true;
     while (true)
     {
-        cout << "Please enter a letter to be the key: ";
-        cin >> keyLetter;
+        getline(cin, key);
+        cout << "Please enter a word without special symbols: ";
+        getline(cin, key);
 
-        keyLetter = tolower(keyLetter);
+        key = toLower(key);
 
-        if (keyLetter > 'a' && keyLetter <= 'z')
+        for(int i = 0; i < key.length(); i++)
+        {
+            passed = true;
+            if(key[i] < 'a' || key[i] > 'z')
+            {
+                cout << "Failed: " << key[i] << endl;
+                passed = false;
+                break;
+            }
+        }
+
+        if (passed)
             break;
         else
             cout << "Not a valid key" << endl;
     }
 
-    return keyLetter;
+    return key;
 }
 
 string phraseToProcess()
 {
     string phrase = "";
-    getline(cin, phrase);
+    // getline(cin, phrase);
     cout << "Please enter a phrase: ";
     getline(cin, phrase);
 
